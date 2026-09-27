@@ -1,4 +1,5 @@
 import MarketingPrimaryCta from "@/components/MarketingPrimaryCta";
+import NoeVentureActions from "@/components/marketing/NoeVentureActions";
 import { SectionHeader } from "@/components/marketing/IntentCard";
 import { northbridgeVentures } from "@/lib/nordi/ventures";
 import { openNordyHref } from "@/lib/nordy/routes";
@@ -7,18 +8,18 @@ import { pageMetadata } from "@/lib/seo";
 export const metadata = pageMetadata({
   title: "Ventures",
   description:
-    "Northbridge Ventures — Aviator Network, AirTax Financial, and other verified portfolio companies from Northbridge Venture Group.",
+    "Northbridge Ventures — Aviator Network, AirTax Financial, NOE Aviation, and other verified portfolio companies from Northbridge Venture Group.",
   path: "/ventures",
   openGraphTitle: "Ventures | Northbridge Venture Group",
   openGraphDescription:
-    "Aviator Network, AirTax Financial, and verified Northbridge portfolio companies.",
+    "Aviator Network, AirTax Financial, NOE Aviation, and verified Northbridge portfolio companies.",
 });
 
 const sectors = [
   {
     id: "aviation",
     title: "Aviation",
-    ventures: ["aviator-network", "airtax-financial"],
+    ventures: ["aviator-network", "airtax-financial", "noe-aviation-operations"],
   },
 ] as const;
 
@@ -65,6 +66,9 @@ export default function VenturesPage() {
                     <p className="mt-3 text-xs uppercase tracking-wide text-stone">
                       {venture.focus}
                     </p>
+                    {venture.id === "noe-aviation-operations" ? (
+                      <NoeVentureActions location="ventures" />
+                    ) : null}
                   </article>
                 ))}
             </div>

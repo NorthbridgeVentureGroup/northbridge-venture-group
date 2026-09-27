@@ -7,6 +7,7 @@ describe("northbridge ventures", () => {
     expect(names).toContain("Northbridge Digital");
     expect(names).toContain("Aviator Network");
     expect(names).toContain("AirTax Financial");
+    expect(names).toContain("NOE Aviation Operations");
   });
 
   it("marks future ventures as incubation", () => {

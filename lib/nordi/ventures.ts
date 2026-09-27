@@ -32,6 +32,14 @@ export const northbridgeVentures: NorthbridgeVenture[] = [
     status: "active",
   },
   {
+    id: "noe-aviation-operations",
+    name: "NOE Aviation Operations",
+    description:
+      "Workforce scheduling and station operations for aviation ground teams. Interactive public demo uses fictional Cedar Peak (RBX) only.",
+    focus: "Ground ops · scheduling · station workforce",
+    status: "active",
+  },
+  {
     id: "future-ventures",
     name: "Future Ventures",
     description:
