@@ -11,7 +11,9 @@ export type AnalyticsEventName =
   | "nordy_lead_qualified"
   | "nordy_human_handoff"
   | "mobile_app_offer_viewed"
-  | "project_cta_clicked";
+  | "project_cta_clicked"
+  | "noe_demo_cta_clicked"
+  | "noe_pilot_cta_clicked";
 
 export type AnalyticsPayload = Record<string, string | number | boolean | undefined>;
 
