@@ -5,6 +5,7 @@ import IlluminatedButton from "@/components/marketing/IlluminatedButton";
 import { openNordyHref } from "@/lib/nordy/routes";
 import { trackAnalytics } from "@/lib/nordy";
 import { northbridgeVentures } from "@/lib/nordi/ventures";
+import NoeVentureActions from "@/components/marketing/NoeVentureActions";
 
 const processSteps = [
   "Understand the problem",
@@ -191,6 +192,9 @@ export default function HomeMarketingPage() {
                 </span>
               </div>
               <p className="mt-3 text-sm leading-relaxed text-silver">{venture.description}</p>
+              {venture.id === "noe-aviation-operations" ? (
+                <NoeVentureActions location="home" />
+              ) : null}
             </article>
           ))}
         </div>
