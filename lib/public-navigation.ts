@@ -14,6 +14,7 @@ export const primaryPublicNavLinks: PublicNavLink[] = [
 ];
 
 export const secondaryPublicNavLinks: PublicNavLink[] = [
+  { href: "/technology/visual-engine", label: "Visual Engine" },
   { href: "/mobile-apps", label: "Mobile Apps" },
   { href: "/privacy", label: "Privacy" },
   { href: "/privacy/settings", label: "Privacy Settings" },
