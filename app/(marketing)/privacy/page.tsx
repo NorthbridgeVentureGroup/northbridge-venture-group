@@ -29,6 +29,10 @@ const sections = [
     title: "Security",
     body: "Your conversations and business details are handled with strict access controls, consistent with Northbridge Digital's security practices.",
   },
+  {
+    title: "Website measurement",
+    body: "If you accept analytics on northbridgeventuregroup.com, the site loads Google Analytics 4 and records the page you visit. Names, email addresses, contact-form messages, and Nordi conversations are not sent. If you decline, the tag does not load. Advertising cookies are not used.",
+  },
 ];
 
 export default function PrivacyPage() {
