@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import { Manrope, Source_Serif_4 } from "next/font/google";
+import { AnalyticsConsent } from "@/components/analytics/AnalyticsConsent";
+import { GaScripts } from "@/components/analytics/GaScripts";
 import { AppProviders } from "@/components/providers/AppProviders";
 import { OrganizationJsonLd } from "@/components/marketing/OrganizationJsonLd";
 import "./globals.css";
@@ -56,6 +58,8 @@ export default function RootLayout({
     <html lang="en" className={`${manrope.variable} ${sourceSerif.variable}`}>
       <body className="antialiased bg-black text-white font-sans overflow-x-hidden">
         <OrganizationJsonLd />
+        <GaScripts />
+        <AnalyticsConsent />
         <AppProviders>{children}</AppProviders>
       </body>
     </html>

@@ -1,3 +1,5 @@
+import { forwardAnalyticsEvent } from "@/lib/analytics/ga4";
+
 export type AnalyticsEventName =
   | "homepage_view"
   | "intent_card_selected"
@@ -27,8 +29,9 @@ export function setAnalyticsSink(next: AnalyticsSink | null): void {
 }
 
 /**
- * Lightweight first-party analytics adapter.
- * Extend with PostHog when configured — do not create a second platform.
+ * First-party analytics adapter.
+ * GA4 receives a sanitized copy only after consent on the production host.
+ * homepage_view is not forwarded: the Google tag sends one page_view itself.
  */
 export function trackAnalytics(
   event: AnalyticsEventName,
@@ -36,6 +39,12 @@ export function trackAnalytics(
 ): void {
   const at = new Date().toISOString();
   memoryEvents.push({ event, payload, at });
+
+  try {
+    forwardAnalyticsEvent(event, payload);
+  } catch {
+    // Analytics must never break UX.
+  }
 
   if (typeof window !== "undefined") {
     const posthog = (window as unknown as { posthog?: { capture?: AnalyticsSink } }).posthog;
