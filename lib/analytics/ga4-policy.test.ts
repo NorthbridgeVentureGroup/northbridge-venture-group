@@ -5,6 +5,7 @@ import {
   analyticsPagePath,
   DESIGNATED_HOSTS,
   GA_MEASUREMENT_ID,
+  installPageViewGuard,
   isDesignatedAnalyticsHost,
   sanitizeAnalyticsParams,
   shouldSendPageView,
@@ -28,6 +29,32 @@ describe("NVG GA4 policy", () => {
     expect(isDesignatedAnalyticsHost("dreduardosuarez.com")).toBe(false);
     expect(isDesignatedAnalyticsHost("northbridge-venture-group.vercel.app")).toBe(false);
     expect(isDesignatedAnalyticsHost("localhost")).toBe(false);
+  });
+
+  it("drops the automatic history page view and keeps a later manual one", () => {
+    const recorded: unknown[] = [];
+    const target = {
+      dataLayer: [] as unknown[],
+      gtag(...args: unknown[]) {
+        recorded.push(args);
+        this.dataLayer.push(args);
+      },
+      history: {
+        pushState() {
+          target.gtag("event", "page_view", { page_path: "/auto" });
+          target.dataLayer.push({ event: "page_view" });
+        },
+        replaceState() {
+          return undefined;
+        },
+      },
+      guarded: false,
+    };
+    installPageViewGuard(target);
+    target.history.pushState();
+    expect(recorded).toEqual([]);
+    target.gtag("event", "page_view", { page_path: "/privacy" });
+    expect(recorded).toEqual([["event", "page_view", { page_path: "/privacy" }]]);
   });
 
   it("collapses duplicate page views and drops query strings", () => {
