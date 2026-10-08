@@ -3,7 +3,12 @@
 import Script from "next/script";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
-import { analyticsCollectionEnabled, GA_MEASUREMENT_ID, sendPageView } from "@/lib/analytics/ga4";
+import {
+  analyticsCollectionEnabled,
+  armPageViewGuard,
+  GA_MEASUREMENT_ID,
+  sendPageView,
+} from "@/lib/analytics/ga4";
 
 /**
  * Next.js `next/script` Google tag.
@@ -45,6 +50,7 @@ export function GaScripts() {
         id="ga4-src"
         src={`https://www.googletagmanager.com/gtag/js?id=${GA_MEASUREMENT_ID}`}
         strategy="afterInteractive"
+        onLoad={armPageViewGuard}
       />
       <Script id="ga4-init" strategy="afterInteractive">
         {`

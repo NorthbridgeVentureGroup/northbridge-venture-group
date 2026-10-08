@@ -2,6 +2,7 @@ import {
   analyticsPagePath,
   CONSENT_COOKIE,
   GA_MEASUREMENT_ID,
+  installPageViewGuard,
   isDesignatedAnalyticsHost,
   sanitizeAnalyticsParams,
   shouldSendPageView,
@@ -51,6 +52,28 @@ export function grantAnalyticsConsent(): void {
 
 export function denyAnalyticsConsent(): void {
   writeConsent("denied");
+}
+
+/** Call after gtag.js loads, so this wrapper sits outside the library's history hook. */
+export function armPageViewGuard(): void {
+  if (typeof window === "undefined" || !window.dataLayer) return;
+  const browser = window as Window & { __nvgHistoryGuard?: boolean };
+  installPageViewGuard({
+    dataLayer: window.dataLayer,
+    get gtag() {
+      return browser.gtag;
+    },
+    set gtag(next) {
+      browser.gtag = next;
+    },
+    history: window.history,
+    get guarded() {
+      return browser.__nvgHistoryGuard === true;
+    },
+    set guarded(value) {
+      browser.__nvgHistoryGuard = value;
+    },
+  });
 }
 
 /** Returns false until gtag exists, so the caller can retry without a second hit. */
