@@ -85,6 +85,7 @@ export function sendPageView(pagePath: string): boolean {
   if (!shouldSendPageView(lastPageView, path, now)) return true;
   window.gtag("event", "page_view", {
     page_path: path,
+    page_location: `${window.location.origin}${path}`,
     send_to: GA_MEASUREMENT_ID,
   });
   lastPageView = { path, at: now };
