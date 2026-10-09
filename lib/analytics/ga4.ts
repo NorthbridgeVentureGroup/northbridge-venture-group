@@ -1,19 +1,25 @@
 import {
+  analyticsLocation,
   analyticsPagePath,
   CONSENT_COOKIE,
   GA_MEASUREMENT_ID,
+  installAnalyticsEventGate,
   installPageViewGuard,
   isDesignatedAnalyticsHost,
   sanitizeAnalyticsParams,
+  sanitizeCollectUrl,
   shouldSendPageView,
 } from "@/lib/analytics/ga4-policy";
 
 export {
+  analyticsLocation,
   analyticsPagePath,
   CONSENT_COOKIE,
   GA_MEASUREMENT_ID,
+  installAnalyticsEventGate,
   isDesignatedAnalyticsHost,
   sanitizeAnalyticsParams,
+  sanitizeCollectUrl,
 };
 
 declare global {
@@ -21,6 +27,7 @@ declare global {
     gtag?: (...args: unknown[]) => void;
     dataLayer?: unknown[];
     __nvgGaConfigured?: boolean;
+    __nvgCollectGuard?: boolean;
   }
 }
 
@@ -54,9 +61,56 @@ export function denyAnalyticsConsent(): void {
   writeConsent("denied");
 }
 
+function bodyHasContactData(data: BodyInit | null | undefined): boolean {
+  if (typeof data === "string") return /@|%40/i.test(data);
+  if (typeof URLSearchParams !== "undefined" && data instanceof URLSearchParams) {
+    return /@|%40/i.test(data.toString());
+  }
+  return false;
+}
+
+export function installCollectGuard(): void {
+  if (typeof window === "undefined" || window.__nvgCollectGuard) return;
+  window.__nvgCollectGuard = true;
+
+  const beacon = navigator.sendBeacon?.bind(navigator);
+  if (beacon) {
+    navigator.sendBeacon = (url: string | URL, data?: BodyInit | null) => {
+      if (bodyHasContactData(data)) return true;
+      return beacon(sanitizeCollectUrl(String(url)), data);
+    };
+  }
+
+  const origFetch = window.fetch.bind(window);
+  window.fetch = (input: RequestInfo | URL, init?: RequestInit) => {
+    if (bodyHasContactData(init?.body)) return Promise.resolve(new Response(null, { status: 204 }));
+    if (typeof input === "string" || input instanceof URL) {
+      return origFetch(sanitizeCollectUrl(String(input)), init);
+    }
+    return origFetch(input, init);
+  };
+
+  const imageSrc = Object.getOwnPropertyDescriptor(HTMLImageElement.prototype, "src");
+  if (imageSrc?.get && imageSrc?.set) {
+    Object.defineProperty(HTMLImageElement.prototype, "src", {
+      configurable: true,
+      enumerable: imageSrc.enumerable,
+      get() {
+        return imageSrc.get!.call(this);
+      },
+      set(value: string) {
+        imageSrc.set!.call(this, sanitizeCollectUrl(String(value)));
+      },
+    });
+  }
+}
+
 /** Call after gtag.js loads, so this wrapper sits outside the library's history hook. */
 export function armPageViewGuard(): void {
-  if (typeof window === "undefined" || !window.dataLayer) return;
+  if (typeof window === "undefined") return;
+  window.dataLayer = window.dataLayer || [];
+  installAnalyticsEventGate(window.dataLayer);
+  installCollectGuard();
   const browser = window as Window & { __nvgHistoryGuard?: boolean };
   installPageViewGuard({
     dataLayer: window.dataLayer,
@@ -83,10 +137,13 @@ export function sendPageView(pagePath: string): boolean {
   const path = analyticsPagePath(pagePath);
   const now = Date.now();
   if (!shouldSendPageView(lastPageView, path, now)) return true;
+  const referrer = document.referrer ? analyticsLocation(document.referrer) : "";
   window.gtag("event", "page_view", {
     page_path: path,
     page_location: `${window.location.origin}${path}`,
+    ...(referrer ? { page_referrer: referrer } : {}),
     send_to: GA_MEASUREMENT_ID,
+    manual_page_view: true,
   });
   lastPageView = { path, at: now };
   return true;

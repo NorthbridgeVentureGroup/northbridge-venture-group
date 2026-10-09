@@ -26,6 +26,90 @@ type GuardTarget = {
   guarded?: boolean;
 };
 
+const BLOCKED_GTM_EVENT = /historyChange|formSubmit|formInteract|formCancel|interactedFormField|user_data/i;
+
+type PushItem = {
+  0?: unknown;
+  1?: unknown;
+  2?: {
+    manual_page_view?: boolean;
+    user_data?: unknown;
+    page_location?: string;
+    page_referrer?: string;
+  };
+  event?: string;
+};
+
+/** Automatic history page views keep the previous query string. Manual views opt in. */
+export function isBlockedAnalyticsPush(item: unknown): boolean {
+  if (!item || typeof item !== "object") return false;
+  const command = item as PushItem;
+  if (command[0] === "event" && command[1] === "page_view") {
+    return command[2]?.manual_page_view !== true;
+  }
+  if (command[0] === "set" && command[1] === "user_data") return true;
+  if (command[0] === "event" && command[2]?.user_data) return true;
+  const eventName = typeof command.event === "string" ? command.event : "";
+  if (BLOCKED_GTM_EVENT.test(eventName)) return true;
+  if (eventName === "page_view") return true;
+  return false;
+}
+
+export function analyticsLocation(value: string): string {
+  const text = String(value || "");
+  try {
+    const url = new URL(text);
+    return `${url.origin}${url.pathname}`;
+  } catch {
+    const path = text.split("?")[0]?.split("#")[0] || "/";
+    return path.startsWith("/") ? path : "/";
+  }
+}
+
+export function installAnalyticsEventGate(dataLayer: unknown[]): void {
+  const layer = dataLayer as unknown[] & { __nbAnalyticsGate?: boolean };
+  if (!layer || layer.__nbAnalyticsGate) return;
+  const realPush = dataLayer.push.bind(dataLayer);
+  dataLayer.push = (...args: unknown[]) => {
+    const item = args[0] as PushItem | undefined;
+    if (isBlockedAnalyticsPush(item)) return dataLayer.length;
+    if (item && item[0] === "event" && item[1] === "page_view" && item[2]) {
+      delete item[2].manual_page_view;
+      if (typeof item[2].page_location === "string") {
+        item[2].page_location = analyticsLocation(item[2].page_location);
+      }
+      if (typeof item[2].page_referrer === "string") {
+        item[2].page_referrer = analyticsLocation(item[2].page_referrer);
+      }
+    }
+    return realPush(...args);
+  };
+  Object.defineProperty(layer, "__nbAnalyticsGate", { value: true });
+}
+
+export function sanitizeCollectUrl(raw: string): string {
+  let url: URL;
+  try {
+    url = new URL(raw);
+  } catch {
+    return raw;
+  }
+  if (!/(^|\.)google-analytics\.com$|(^|\.)analytics\.google\.com$|(^|\.)googletagmanager\.com$/.test(url.hostname)) {
+    return raw;
+  }
+  for (const key of ["dl", "dr"]) {
+    const value = url.searchParams.get(key);
+    if (!value) continue;
+    url.searchParams.set(key, analyticsLocation(value));
+  }
+  for (const key of [...url.searchParams.keys()]) {
+    if (/email|phone|user_data/i.test(key)) url.searchParams.delete(key);
+    const value = url.searchParams.get(key);
+    if (value && /@|%40/i.test(value)) url.searchParams.delete(key);
+  }
+  return url.toString();
+}
+
 /**
  * GA4's script also emits a page_view when the app changes history.
  * This guard drops those automatic hits. The site sends one sanitized page_view itself.
@@ -33,19 +117,16 @@ type GuardTarget = {
 export function installPageViewGuard(target: GuardTarget): void {
   if (target.guarded) return;
   target.guarded = true;
+  installAnalyticsEventGate(target.dataLayer);
 
   const wrap = (method: HistoryMethod) => {
-    const original = target.history[method].bind(target.history);
-    target.history[method] = ((...args: Parameters<History[HistoryMethod]>) => {
-      const layer = target.dataLayer;
-      const realPush = layer.push.bind(layer);
+    const original = target.history[method].bind(target.history) as (...args: unknown[]) => unknown;
+    target.history[method] = ((...args: unknown[]) => {
       const realGtag = target.gtag;
-      layer.push = () => layer.length;
       target.gtag = () => undefined;
       try {
         return original(...args);
       } finally {
-        layer.push = realPush;
         target.gtag = realGtag;
       }
     }) as History[HistoryMethod];
