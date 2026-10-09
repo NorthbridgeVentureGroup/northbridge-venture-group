@@ -109,7 +109,7 @@ export function installCollectGuard(): void {
 export function armPageViewGuard(): void {
   if (typeof window === "undefined") return;
   window.dataLayer = window.dataLayer || [];
-  installAnalyticsEventGate(window.dataLayer);
+  installAnalyticsEventGate(window.dataLayer, "outer");
   installCollectGuard();
   const browser = window as Window & { __nvgHistoryGuard?: boolean };
   installPageViewGuard({

@@ -120,6 +120,34 @@ describe("NVG GA4 policy", () => {
     expect(clean.searchParams.get("ep.email")).toBeNull();
   });
 
+  it("drops history events before a tag wrapper installed later", () => {
+    const dataLayer: unknown[] = [];
+    installAnalyticsEventGate(dataLayer);
+    const seen: unknown[] = [];
+    const innerPush = dataLayer.push.bind(dataLayer);
+    dataLayer.push = (...args: unknown[]) => {
+      seen.push(args[0]);
+      return innerPush(...args);
+    };
+    installAnalyticsEventGate(dataLayer, "outer");
+    dataLayer.push({
+      event: "gtm.historyChange-v2",
+      "gtm.oldUrl": "https://northbridgeventuregroup.com/contact?email=person@example.com",
+    });
+    dataLayer.push([
+      "event",
+      "page_view",
+      {
+        manual_page_view: true,
+        page_path: "/privacy",
+        page_location: "https://northbridgeventuregroup.com/privacy",
+      },
+    ]);
+    expect(seen).toHaveLength(1);
+    expect((seen[0] as [string, string])[1]).toBe("page_view");
+    expect(dataLayer).toHaveLength(1);
+  });
+
   it("keeps the Google tag gated and leaves SEO files unchanged in spirit", () => {
     const ga = readFileSync(join(root, "components/analytics/GaScripts.tsx"), "utf8");
     const events = readFileSync(join(root, "lib/nordy/analytics.ts"), "utf8");
