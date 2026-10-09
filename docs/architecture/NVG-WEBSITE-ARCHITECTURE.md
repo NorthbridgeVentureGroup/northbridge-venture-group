@@ -30,6 +30,23 @@ NEO is **not** a commercial division. NEO is the shared engineering, intelligenc
 
 Operations routes under `/operations/*` remain product surfaces (`noindex`).
 
+## Suite and product subdomain architecture
+
+Northbridge now has a documented two-level public namespace:
+
+- **Suite/category subdomains** are marketing, discovery, education, and commercial-routing surfaces owned by the corporate website.
+- **Product subdomains** are owned by the actual product repository/deployment and run the product experience.
+
+Canonical principle:
+
+> **Suite domain = explain + sell + route. Product domain = run the product.**
+
+The detailed page-by-page plan, suite content structure, CTA taxonomy, SEO model, product routing, and implementation sequencing are defined in:
+
+- `docs/architecture/NVG-SUBDOMAIN-SUITE-MARKETING-ARCHITECTURE.md`
+
+Implementation remains separately authorized.
+
 ## Homepage conversion model
 
 1. Hero — “Northbridge builds companies, software, and intelligent systems.”
@@ -51,12 +68,17 @@ Operations routes under `/operations/*` remain product surfaces (`noindex`).
 
 First-party event adapter in `lib/nordy/analytics.ts` with PostHog passthrough when `window.posthog` exists. Events include homepage/intent/Nordy qualification signals.
 
+Cross-subdomain analytics and source attribution must be normalized before suite subdomains are activated.
+
 ## SEO
 
 Root metadata, Open Graph, Twitter cards, `robots.ts`, `sitemap.ts`, Organization JSON-LD.
 
+The current sitemap is single-host. Suite subdomain activation requires an explicit multi-host canonical/sitemap strategy before implementation.
+
 ## Related docs
 
+- `docs/architecture/NVG-SUBDOMAIN-SUITE-MARKETING-ARCHITECTURE.md`
 - `docs/architecture/NORDY-NEO-INTEGRATION.md`
 - `docs/architecture/NORDY-INTAKE-AND-LEARNING.md`
 - Canonical NEO doctrine remains owned by the NEOS repository.
