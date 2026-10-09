@@ -1,8 +1,11 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import { capabilityRegistry } from "@/lib/nordy/capability-registry";
+import { SITE_ORIGIN } from "@/lib/seo";
 
 const origin = "https://digital.northbridgeventuregroup.com";
+/** Corporate paths must leave the suite host — relative links would stay on digital.* */
+const corporateContact = `${SITE_ORIGIN}/contact#custom-project`;
+const corporateEngineering = `${SITE_ORIGIN}/engineering-ai`;
 
 export const metadata: Metadata = {
   title: "Northbridge Digital",
@@ -46,12 +49,12 @@ export default function DigitalSuitePage() {
             AI-enabled workflows. More complex custom systems route to Northbridge Engineering.
           </p>
           <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-            <Link
-              href="/contact#custom-project"
+            <a
+              href={corporateContact}
               className="inline-flex min-h-11 items-center justify-center rounded-xl bg-red px-6 py-3 text-sm font-semibold text-white hover:bg-red-hover"
             >
               Request a Quote
-            </Link>
+            </a>
             <a
               href="#business-tools"
               className="inline-flex min-h-11 items-center justify-center rounded-xl border border-white/15 px-6 py-3 text-sm font-semibold text-white hover:border-white/30 hover:bg-white/5"
@@ -116,9 +119,9 @@ export default function DigitalSuitePage() {
               If the requirement becomes a custom platform, specialized architecture, advanced AI,
               or a complex multi-system implementation, Northbridge Engineering is the better fit.
             </p>
-            <Link href="/engineering-ai" className="mt-5 inline-block text-sm font-semibold text-red">
+            <a href={corporateEngineering} className="mt-5 inline-block text-sm font-semibold text-red">
               Explore Engineering & AI →
-            </Link>
+            </a>
           </div>
         </section>
       </div>

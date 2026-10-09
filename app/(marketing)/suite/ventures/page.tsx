@@ -1,8 +1,9 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import { northbridgeVentures } from "@/lib/nordi/ventures";
+import { SITE_ORIGIN } from "@/lib/seo";
 
 const origin = "https://ventures.northbridgeventuregroup.com";
+const corporatePartner = `${SITE_ORIGIN}/partner`;
 
 export const metadata: Metadata = {
   title: "Northbridge Ventures",
@@ -100,12 +101,12 @@ export default function VenturesSuitePage() {
             Venture partnerships are evaluated separately from Digital services and Engineering
             engagements.
           </p>
-          <Link
-            href="/partner"
+          <a
+            href={corporatePartner}
             className="mt-8 inline-flex min-h-11 items-center justify-center rounded-xl bg-red px-6 py-3 text-sm font-semibold text-white hover:bg-red-hover"
           >
             Partner With Northbridge
-          </Link>
+          </a>
         </section>
       </div>
     </main>

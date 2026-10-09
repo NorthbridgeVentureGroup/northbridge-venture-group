@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import SuiteLandingPage from "@/components/marketing/SuiteLandingPage";
+import { SITE_ORIGIN } from "@/lib/seo";
 
 const origin = "https://logistics.northbridgeventuregroup.com";
 
@@ -36,7 +37,7 @@ export default function LogisticsSuitePage() {
             "A purchasing-control product designed to give operations teams clearer purchase-order workflows, status visibility, and accountability. Product capabilities shown publicly must remain aligned with the NPC source of truth.",
           href: "https://npc.northbridgeventuregroup.com",
           primaryLabel: "Open NPC",
-          secondaryHref: "/engineering-ai",
+          secondaryHref: `${SITE_ORIGIN}/engineering-ai`,
           secondaryLabel: "Need Custom Logistics Software?",
         },
       ]}

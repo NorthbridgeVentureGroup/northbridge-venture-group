@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
-import { resolveSuiteRoute } from "@/lib/subdomain-routing";
+import { resolveMarketingRoute } from "@/lib/subdomain-routing";
 
 export function middleware(request: NextRequest) {
-  const route = resolveSuiteRoute(
+  const route = resolveMarketingRoute(
     request.headers.get("host"),
     request.nextUrl.pathname,
   );

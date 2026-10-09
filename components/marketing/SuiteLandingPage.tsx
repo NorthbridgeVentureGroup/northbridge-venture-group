@@ -3,8 +3,9 @@ import Link from "next/link";
 export type SuiteProduct = {
   name: string;
   description: string;
-  href: string;
-  primaryLabel: string;
+  /** Omit when no verified public destination exists yet. */
+  href?: string;
+  primaryLabel?: string;
   secondaryHref?: string;
   secondaryLabel?: string;
 };
@@ -113,16 +114,24 @@ export default function SuiteLandingPage({
                 <p className="mt-3 text-sm leading-relaxed text-silver">
                   {product.description}
                 </p>
-                <div className="mt-6 flex flex-col gap-3 sm:flex-row">
-                  <ActionLink href={product.href} primary>
-                    {product.primaryLabel}
-                  </ActionLink>
-                  {product.secondaryHref && product.secondaryLabel ? (
+                {product.href && product.primaryLabel ? (
+                  <div className="mt-6 flex flex-col gap-3 sm:flex-row">
+                    <ActionLink href={product.href} primary>
+                      {product.primaryLabel}
+                    </ActionLink>
+                    {product.secondaryHref && product.secondaryLabel ? (
+                      <ActionLink href={product.secondaryHref}>
+                        {product.secondaryLabel}
+                      </ActionLink>
+                    ) : null}
+                  </div>
+                ) : product.secondaryHref && product.secondaryLabel ? (
+                  <div className="mt-6 flex flex-col gap-3 sm:flex-row">
                     <ActionLink href={product.secondaryHref}>
                       {product.secondaryLabel}
                     </ActionLink>
-                  ) : null}
-                </div>
+                  </div>
+                ) : null}
               </article>
             ))}
           </div>

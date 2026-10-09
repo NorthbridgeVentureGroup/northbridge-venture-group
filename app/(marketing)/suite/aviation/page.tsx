@@ -1,7 +1,10 @@
 import type { Metadata } from "next";
 import SuiteLandingPage from "@/components/marketing/SuiteLandingPage";
+import { EXTERNAL_PRODUCT_ORIGINS } from "@/lib/subdomain-routing";
 
 const origin = "https://aviation.northbridgeventuregroup.com";
+const aviatorMarketing = "https://aviatornetwork.northbridgeventuregroup.com";
+const naeroxProduct = EXTERNAL_PRODUCT_ORIGINS.naerox;
 
 export const metadata: Metadata = {
   title: "Northbridge Aviation Suite",
@@ -34,15 +37,16 @@ export default function AviationSuitePage() {
           name: "Aviator Network",
           description:
             "Aviation training ecosystem for pilots, students, instructors, logbook workflows, CAT, and related training tools.",
-          href: "https://aviatornetwork.northbridgeventuregroup.com",
-          primaryLabel: "Open Aviator Network",
+          href: aviatorMarketing,
+          primaryLabel: "Learn about Aviator Network",
         },
         {
-          name: "NOE / Aviation Operations",
+          // Public name: Naerox only. Direct product host — no corporate detail page.
+          name: "Naerox",
           description:
-            "Northbridge aviation operations software focused on workforce and operational decision workflows. Public naming and product-domain normalization remain subject to the canonical product identity.",
-          href: "https://aerox.northbridgeventuregroup.com",
-          primaryLabel: "Open Aviation Operations",
+            "Northbridge aviation operations software focused on workforce and operational decision workflows. The live product runs on its own deployment.",
+          href: naeroxProduct,
+          primaryLabel: "Open Naerox",
         },
       ]}
       useCasesTitle="Common aviation use cases"
@@ -59,9 +63,9 @@ export default function AviationSuitePage() {
         "Web, mobile, AI, and operational systems under shared Northbridge engineering standards",
         "Clear separation between marketing suites and the actual product applications",
       ]}
-      finalTitle="Choose the aviation product that fits the job."
-      finalDescription="Use the suite to understand the product family, then continue into the actual product experience."
-      finalHref="https://aviatornetwork.northbridgeventuregroup.com"
+      finalTitle="Start with Aviator Network."
+      finalDescription="Use the suite to understand the product family, then continue to the Aviator Network marketing page — and open the live product when you are ready."
+      finalHref={aviatorMarketing}
       finalLabel="Explore Aviator Network"
     />
   );
