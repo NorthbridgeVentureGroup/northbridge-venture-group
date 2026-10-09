@@ -7,6 +7,8 @@ import {
   analyticsCollectionEnabled,
   armPageViewGuard,
   GA_MEASUREMENT_ID,
+  installAnalyticsEventGate,
+  installCollectGuard,
   sendPageView,
 } from "@/lib/analytics/ga4";
 
@@ -44,20 +46,28 @@ export function GaScripts() {
 
   if (!enabled) return null;
 
+  if (typeof window !== "undefined") {
+    window.dataLayer = window.dataLayer || [];
+    installAnalyticsEventGate(window.dataLayer);
+    installCollectGuard();
+  }
+
   return (
     <>
-      <Script
-        id="ga4-src"
-        src={`https://www.googletagmanager.com/gtag/js?id=${GA_MEASUREMENT_ID}`}
-        strategy="afterInteractive"
-        onLoad={armPageViewGuard}
-      />
       <Script id="ga4-init" strategy="afterInteractive">
         {`
           if (!window.__nvgGaConfigured) {
             window.__nvgGaConfigured = true;
             window.dataLayer = window.dataLayer || [];
             window.gtag = function gtag(){window.dataLayer.push(arguments);};
+            window.gtag('consent', 'default', {
+              ad_storage: 'denied',
+              ad_user_data: 'denied',
+              ad_personalization: 'denied',
+              analytics_storage: 'granted',
+              functionality_storage: 'denied',
+              personalization_storage: 'denied'
+            });
             window.gtag('js', new Date());
             window.gtag('config', '${GA_MEASUREMENT_ID}', {
               send_page_view: false,
@@ -67,6 +77,12 @@ export function GaScripts() {
           }
         `}
       </Script>
+      <Script
+        id="ga4-src"
+        src={`https://www.googletagmanager.com/gtag/js?id=${GA_MEASUREMENT_ID}`}
+        strategy="afterInteractive"
+        onLoad={armPageViewGuard}
+      />
     </>
   );
 }
