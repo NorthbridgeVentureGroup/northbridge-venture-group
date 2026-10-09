@@ -66,25 +66,33 @@ export function analyticsLocation(value: string): string {
   }
 }
 
-export function installAnalyticsEventGate(dataLayer: unknown[]): void {
-  const layer = dataLayer as unknown[] & { __nbAnalyticsGate?: boolean };
-  if (!layer || layer.__nbAnalyticsGate) return;
+export function installAnalyticsEventGate(dataLayer: unknown[], position: "inner" | "outer" = "inner"): void {
+  const layer = dataLayer as unknown[] & { __nbAnalyticsGate?: string };
+  if (!layer) return;
+  if (position === "outer") {
+    if (layer.__nbAnalyticsGate === "outer") return;
+  } else if (layer.__nbAnalyticsGate) {
+    return;
+  }
   const realPush = dataLayer.push.bind(dataLayer);
   dataLayer.push = (...args: unknown[]) => {
     const item = args[0] as PushItem | undefined;
     if (isBlockedAnalyticsPush(item)) return dataLayer.length;
-    if (item && item[0] === "event" && item[1] === "page_view" && item[2]) {
-      delete item[2].manual_page_view;
-      if (typeof item[2].page_location === "string") {
-        item[2].page_location = analyticsLocation(item[2].page_location);
+    const params = item?.[2];
+    const manual = params?.manual_page_view === true;
+    if (manual && params) {
+      if (typeof params.page_location === "string") {
+        params.page_location = analyticsLocation(params.page_location);
       }
-      if (typeof item[2].page_referrer === "string") {
-        item[2].page_referrer = analyticsLocation(item[2].page_referrer);
+      if (typeof params.page_referrer === "string") {
+        params.page_referrer = analyticsLocation(params.page_referrer);
       }
     }
-    return realPush(...args);
+    const result = realPush(...args);
+    if (manual && params) delete params.manual_page_view;
+    return result;
   };
-  Object.defineProperty(layer, "__nbAnalyticsGate", { value: true });
+  layer.__nbAnalyticsGate = position;
 }
 
 export function sanitizeCollectUrl(raw: string): string {
