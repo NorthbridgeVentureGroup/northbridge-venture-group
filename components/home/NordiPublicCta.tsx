@@ -1,7 +1,7 @@
 "use client";
 
-import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { corporateOriginHref } from "@/lib/corporate-navigation";
 import { openNordyHref } from "@/lib/nordy/routes";
 
 export function useNordiPublicCtaLabel(): string {
@@ -16,12 +16,12 @@ type NordiPublicCtaProps = {
 
 export default function NordiPublicCta({
   variant = "primary",
-  href = openNordyHref("HOME"),
+  href,
   className = "",
 }: NordiPublicCtaProps) {
   const label = useNordiPublicCtaLabel();
   const pathname = usePathname();
-  const resolvedHref = href || openNordyHref("HOME");
+  const resolvedHref = href || corporateOriginHref(openNordyHref("HOME"));
 
   const classes =
     variant === "header"
@@ -29,12 +29,12 @@ export default function NordiPublicCta({
       : "inline-flex min-h-11 w-full items-center justify-center rounded-xl bg-red px-6 py-3.5 text-sm font-semibold text-white transition hover:bg-red-hover sm:w-auto";
 
   return (
-    <Link
+    <a
       href={resolvedHref}
       className={`${classes} ${className}`}
       aria-current={pathname?.includes("nordy=open") ? "page" : undefined}
     >
       {label}
-    </Link>
+    </a>
   );
 }

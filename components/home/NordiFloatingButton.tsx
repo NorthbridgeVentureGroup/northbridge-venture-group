@@ -1,8 +1,8 @@
 "use client";
 
-import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useNordiPublicCtaLabel } from "@/components/home/NordiPublicCta";
+import { corporateOriginHref } from "@/lib/corporate-navigation";
 import { openNordyHref } from "@/lib/nordy/routes";
 
 export default function NordiFloatingButton() {
@@ -14,8 +14,8 @@ export default function NordiFloatingButton() {
   }
 
   return (
-    <Link
-      href={openNordyHref("HOME")}
+    <a
+      href={corporateOriginHref(openNordyHref("HOME"))}
       aria-label={label}
       className="fixed bottom-5 right-5 z-40 flex h-14 min-w-14 items-center justify-center gap-2 rounded-full bg-red px-4 text-white shadow-lg transition-colors hover:bg-red-hover focus:outline-none focus:ring-2 focus:ring-red/50 sm:bottom-6 sm:right-6 sm:px-5 illum-l3"
     >
@@ -26,6 +26,6 @@ export default function NordiFloatingButton() {
         N
       </span>
       <span className="hidden max-w-[9rem] truncate text-sm font-semibold sm:inline">{label}</span>
-    </Link>
+    </a>
   );
 }

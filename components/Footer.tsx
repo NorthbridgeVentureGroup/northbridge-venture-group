@@ -1,5 +1,5 @@
-import Link from "next/link";
 import NorthbridgeLogo from "@/components/NorthbridgeLogo";
+import { corporateOriginHref } from "@/lib/corporate-navigation";
 import { primaryPublicNavLinks, secondaryPublicNavLinks } from "@/lib/public-navigation";
 import { openNordyHref } from "@/lib/nordy/routes";
 
@@ -12,9 +12,9 @@ export default function Footer() {
         <div className="flex flex-col gap-10 sm:gap-14">
           <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-10 md:gap-20">
             <div className="flex flex-col gap-3">
-              <Link href="/" className="inline-block w-fit">
+              <a href={corporateOriginHref("/")} className="inline-block w-fit">
                 <NorthbridgeLogo className="h-8 sm:h-9" />
-              </Link>
+              </a>
               <p className="text-silver text-sm max-w-[320px] leading-relaxed">
                 Northbridge Venture Group builds companies, software, and intelligent
                 systems — ventures, Engineering & AI, and Digital products.
@@ -37,12 +37,12 @@ export default function Footer() {
                 <ul className="space-y-2.5">
                   {footerNavLinks.map((link) => (
                     <li key={link.href}>
-                      <Link
-                        href={link.href}
+                      <a
+                        href={corporateOriginHref(link.href)}
                         className="text-sm text-white/75 hover:text-white transition-colors"
                       >
                         {link.label}
-                      </Link>
+                      </a>
                     </li>
                   ))}
                 </ul>
@@ -55,12 +55,12 @@ export default function Footer() {
                   Talk to Nordi to explore Northbridge or qualify a Digital or
                   Engineering & AI project.
                 </p>
-                <Link
-                  href={openNordyHref("HOME")}
+                <a
+                  href={corporateOriginHref(openNordyHref("HOME"))}
                   className="inline-flex min-h-11 items-center mt-4 text-sm font-medium text-red hover:text-red-hover transition-colors"
                 >
                   Talk to Nordi →
-                </Link>
+                </a>
               </div>
             </div>
           </div>
